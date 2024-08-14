@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Websites Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+        #website-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .website-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px auto;
+            padding: 15px;
+            width: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .website-item img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .website-item a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            flex-grow: 1;
+        }
+        .delete-button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #ff1a1a;
+        }
+        #add-website-form {
+            margin-top: 20px;
+        }
+        #add-website-form input, #add-website-form button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px;
+        }
+        #add-website-form input[type="text"] {
+            width: 60%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #add-website-form button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #add-website-form button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>My Favorite Websites</h1>
+
+    <ul id="website-list">
+        <!-- Website items will be dynamically added here -->
+    </ul>
+
+    <form id="add-website-form">
+        <input type="text" id="website-name" placeholder="Website Name" required>
+        <input type="text" id="website-url" placeholder="Website URL" required>
+        <input type="text" id="website-icon" placeholder="Icon URL (optional)">
+        <button type="submit">Add Website</button>
+    </form>
+
+    <script>
+        const websiteList = document.getElementById('website-list');
+        const addWebsiteForm = document.getElementById('add-website-form');
+
+        // Load websites from localStorage
+        function loadWebsites() {
+            const websites = JSON.parse(localStorage.getItem('websites')) || [];
+            websites.forEach(website => {
+                addWebsiteToDOM(website);
+            });
+        }
+
+        // Save websites to localStorage
+        function saveWebsites(websites) {
+            localStorage.setItem('websites', JSON.stringify(websites));
+        }
+
+        // Add a website to the DOM
+        function addWebsiteToDOM(website) {
+            const websiteItem = document.createElement('li');
+            websiteItem.className = 'website-item';
+            websiteItem.innerHTML = `
+                <img src="${website.icon}" alt="${website.name} Icon">
+                <a href="${website.url}" target="_blank">${website.name}</a>
+                <button class="delete-button">Delete</button>
+            `;
+
+            websiteList.appendChild(websiteItem);
+
+            // Add delete functionality
+            websiteItem.querySelector('.delete-button').addEventListener('click', function() {
+                removeWebsite(website);
+                websiteList.removeChild(websiteItem);
+            });
+        }
+
+        // Remove a website from localStorage
+        function removeWebsite(website) {
+            let websites = JSON.parse(localStorage.getItem('websites')) || [];
+            websites = websites.filter(w => w.url !== website.url);
+            saveWebsites(websites);
+        }
+
+        addWebsiteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('website-name').value;
+            const url = document.getElementById('website-url').value;
+            const icon = document.getElementById('website-icon').value || 'https://via.placeholder.com/40';
+
+            const website = { name, url, icon };
+
+            addWebsiteToDOM(website);
+
+            let websites = JSON.parse(localStorage.getItem('websites')) || [];
+            websites.push(website);
+            saveWebsites(websites);
+
+            // Clear input fields
+            document.getElementById('website-name').value = '';
+            document.getElementById('website-url').value = '';
+            document.getElementById('website-icon').value = '';
+        });
+
+        // Initial load
+        loadWebsites();
+    </script>
+
+</body>
+</html>
